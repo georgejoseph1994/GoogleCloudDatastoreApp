@@ -17,6 +17,17 @@
     />
     <!-- [END css] -->
   </head>
+  <style>
+    .bg-vue-green {
+        background-color: #53b982;
+    }
+    .bg-vue-grey-light{
+        background-color: #4F617D;
+    }
+    .bg-vue-grey{
+        background-color: #3C495E;
+    }
+</style>
   <body style="font-family: 'Roboto', sans-serif;">
     <div
       class="w-full py-2 text-center text-white"
@@ -59,11 +70,10 @@
         </div>
       </div>
     </nav>
-    <div class="container border h-screen mx-auto p-6 mt-6" ">
-        
-      <div class="flex justify-evenly">
-        <a href="/Name" class="p-6 w-5/12 shadow cursor-pointer  hover:shadow-md text-gray-600 text-center"><div>Change Name</div></a>
-        <a href="/Password" class="p-6 w-5/12 shadow cursor-pointer  hover:shadow-md text-gray-600 text-center"><div >Change Password</div></a>
+    <div class="container mx-auto p-6 mt-6" >
+      <div class="shadow mx-auto w-1/2 px-6 py-40">
+        <a href="/Name" class="block bg-vue-grey-light p-4 shadow cursor-pointer  hover:shadow-md text-center w-full text-white">Change Name</a>
+        <a href="/Password" class="block bg-vue-green mt-3 p-4 shadow cursor-pointer  hover:shadow-md text-center w-full text-white">Change Password</a>
       </div>
     </div>
   </body>
