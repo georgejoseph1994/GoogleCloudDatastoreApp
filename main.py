@@ -19,14 +19,17 @@ def user_key(user_name):
 
 
 def auth_guard(self):
-    if self.session.get('user_id') == '' or self.session.get('user_name') == '':
+    if self.session.get('user_id') == '' or self.session.get('user_name') == '' or self.session.get('user_id') == None or self.session.get('user_name') == None:
         self.redirect("/")
 
+def auth_reroute(self):
+    if self.session.get('user_id') != '' and self.session.get('user_id') != None :
+        self.redirect("/main")
 
 class User(ndb.Model):
     id = ndb.KeyProperty(kind='User', repeated=False)
     name = ndb.StringProperty(indexed=True)
-    password = ndb.StringProperty(indexed=True)
+    password = ndb.IntegerProperty(indexed=True)
 
 
 class BaseHandler(webapp2.RequestHandler):
@@ -50,12 +53,11 @@ class BaseHandler(webapp2.RequestHandler):
 class LoginPage(BaseHandler):
 
     def get(self):
-        # user = User( id = user_key('s3752764'), name = "George Joseph" , password="123456")
+        # user = User( id = user_key('s3752764'), name = "George Joseph" , password=123456)
         # user.put();
 
         # Already logged in check
-        if self.session.get('user_id') != '' and self.session.get('user_name') != '':
-            self.redirect("/main")
+        auth_reroute(self)
 
         template_values = {
             'errors': []
@@ -73,12 +75,13 @@ class LoginPage(BaseHandler):
             errors['user_name'].append("Please enter username")
         if password == '':
             errors['password'].append("Please enter password")
-
+        if not password.isdigit():
+            errors['password'].append("User id or password is invalid")
         user_data = []
 
         if errors['user_name'] == [] and errors['password'] == []:
             user_query = User.query().filter(User.id == user_key(
-                user_name)).filter(User.password == password)
+                user_name)).filter(User.password == int(password))
             user_data = user_query.fetch(1)
 
             if len(user_data) >= 1:
@@ -133,7 +136,7 @@ class NamePage(BaseHandler):
         # Authentication guard
         auth_guard(self)
 
-        user_name = self.request.get('user_name')
+        user_name = self.request.get('user_name').strip()
 
         success = False
         errors = {'user_name': []}
@@ -177,27 +180,31 @@ class PasswordPage(BaseHandler):
         # Authentication guard
         auth_guard(self)
 
-        old_password = self.request.get('old_password')
-        new_password = self.request.get('new_password')
+        old_password = self.request.get('old_password').strip()
+        new_password = self.request.get('new_password').strip()
 
         errors = {'old_password': [], 'new_password': []}
 
         # Form validation for empty fields
         if old_password == '':
             errors['old_password'].append("Please enter old password")
+        if not old_password.isdigit():
+            errors['old_password'].append("Please enter a number for old password")
         if new_password == '':
             errors['new_password'].append("Please enter new password")
+        if not new_password.isdigit():
+            errors['new_password'].append("Please enter a number for new password")
 
         # If there are no empty field errors
         if errors['old_password'] == [] and errors['new_password'] == []:
             # Fetching the user record from datastore
             key = user_key(self.session.get('user_id'))
             user_record = User.query().filter(User.id == key).filter(
-                User.password == old_password).fetch(1)
+                User.password == int(old_password)).fetch(1)
 
             # If data fetched successfully
             if len(user_record) >= 1:
-                user_record[0].password = new_password
+                user_record[0].password = int(new_password)
                 user_record[0].put()
                 template_values = {
                     'user_name': self.session.get('user_name'),
